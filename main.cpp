@@ -22,11 +22,11 @@ constexpr uint32_t HEIGHT = 600;
 const vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-//#ifdef NDEBUG
-//constexpr bool enableValidationLayers = false;
-//#else
+#ifdef NDEBUG
+constexpr bool enableValidationLayers = false;
+#else
 constexpr bool enableValidationLayers = true;
-//#endif
+#endif
 
 struct QueueFamilyIndices {
     optional<uint32_t> graphicsFamily;
@@ -87,6 +87,8 @@ private:
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
+        std::cout << "Vulkan supported?: " << glfwVulkanSupported() << std::endl;
+
         window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
     }
 
@@ -110,6 +112,8 @@ private:
             glfwPollEvents();
             drawFrame();
         }
+
+        vkDeviceWaitIdle(device);
     }
 
     void drawFrame() {
@@ -117,7 +121,7 @@ private:
         vkResetFences(device, 1, &inFlightFence);
 
         uint32_t imageIndex;
-        vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, inFlightFence, &imageIndex);
+        vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 
         vkResetCommandBuffer(commandBuffer, 0);
         recordCommandBuffer(commandBuffer, imageIndex);
@@ -192,7 +196,7 @@ private:
         VkApplicationInfo appInfo{};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         appInfo.pApplicationName = "Hello Triangle";
-        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+        appInfo.applicationVersion = VK_MAKE_VERSION(0, 0, 0);
         appInfo.pEngineName = "No Engine";
         appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
         appInfo.apiVersion = VK_API_VERSION_1_0;
@@ -212,10 +216,10 @@ private:
         const char **glfwExtensions;
 
         glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
+//
         createInfo.enabledExtensionCount = glfwExtensionCount;
         createInfo.ppEnabledExtensionNames = glfwExtensions;
-        createInfo.enabledLayerCount = 0;
+//        createInfo.enabledLayerCount = 0;
 
         if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create instance!");
@@ -243,7 +247,7 @@ private:
             throw std::runtime_error("Failed to create window surface!");
         }
 
-        std::cout << "Successfully created surface!" << std::endl;
+        std::cout << "Successfully created window surface!" << std::endl;
     }
 
     void pickPhysicalDevice() {
@@ -643,23 +647,22 @@ private:
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        auto imageSemaphoreSuccess =
+        auto createImageSemaphoreSuccess =
                 vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore) == VK_SUCCESS;
-        if (!imageSemaphoreSuccess) {
+        if (!createImageSemaphoreSuccess) {
             throw std::runtime_error("Failed to create image available semaphore!");
         }
 
-        auto renderSemaphoreSuccess =
+        auto createRenderSemaphore =
                 vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) == VK_SUCCESS;
-        if (!renderSemaphoreSuccess) {
+        if (!createRenderSemaphore) {
             throw std::runtime_error("Failed to create render finished semaphore!");
         }
 
-        auto fenceResult = vkCreateFence(device, &fenceInfo, nullptr, &inFlightFence) == VK_SUCCESS;
-        if (!fenceResult) {
+        auto createFenceSuccess = vkCreateFence(device, &fenceInfo, nullptr, &inFlightFence) == VK_SUCCESS;
+        if (!createFenceSuccess) {
             throw std::runtime_error("Failed to in flight fence!");
         }
-
     }
 
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
@@ -672,7 +675,6 @@ private:
             throw std::runtime_error("Failed to begin recording command buffer!");
         }
 
-
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = renderPass;
@@ -680,7 +682,7 @@ private:
         renderPassInfo.renderArea.offset = {0, 0};
         renderPassInfo.renderArea.extent = swapChainExtent;
 
-        VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+        VkClearValue clearColor = {{{0.0f, 0.0f, 1.0f, 1.0f}}};
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
 
@@ -825,7 +827,7 @@ private:
     }
 
 
-    static bool checkValidationLayerSupport() {
+    bool checkValidationLayerSupport() {
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
