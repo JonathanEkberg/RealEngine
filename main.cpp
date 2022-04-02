@@ -448,8 +448,8 @@ private:
     }
 
     void createGraphicsPipeline() {
-        auto vertShaderCode = readFile("../shaders/vert.spv");
-        auto fragShaderCode = readFile("../shaders/frag.spv");
+        const auto vertShaderCode = readFile("./shaders/vert.spv");
+        const auto fragShaderCode = readFile("./shaders/frag.spv");
 
         std::cout << "Vert shader size: " << vertShaderCode.size() << "\n";
         std::cout << "Frag shader size: " << fragShaderCode.size() << std::endl;
@@ -682,7 +682,7 @@ private:
         renderPassInfo.renderArea.offset = {0, 0};
         renderPassInfo.renderArea.extent = swapChainExtent;
 
-        VkClearValue clearColor = {{{0.0f, 0.0f, 1.0f, 1.0f}}};
+        VkClearValue clearColor = {{{0.05f, 0.05f, 0.05f, 1.0f}}};
         renderPassInfo.clearValueCount = 1;
         renderPassInfo.pClearValues = &clearColor;
 
