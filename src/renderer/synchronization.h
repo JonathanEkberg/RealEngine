@@ -1,11 +1,12 @@
 #pragma once
 
-#include "context.hpp"
+#include "context.h"
 
 #define GLFW_INCLUDE_VULKAN
 
 #include <GLFW/glfw3.h>
+#include <stdexcept>
 
 namespace Renderer {
-    void createInstance(Context *ctx);
+    void createSyncObjects(Context *ctx);
 }

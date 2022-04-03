@@ -1,4 +1,4 @@
-#include "shader.hpp"
+#include "shader.h"
 
 VkShaderModule Renderer::createShaderModule(Renderer::Context *ctx, const vector<char> &code) {
     VkShaderModuleCreateInfo createInfo{};

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "context.hpp"
-#include "swap_chain.hpp"
+#include "context.h"
+#include "swap_chain.h"
 
 #define GLFW_INCLUDE_VULKAN
 

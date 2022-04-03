@@ -1,6 +1,6 @@
-#include "device.hpp"
-#include "constants.hpp"
-#include "swap_chain.hpp"
+#include "device.h"
+#include "constants.h"
+#include "swap_chain.h"
 
 #include <stdexcept>
 #include <iostream>

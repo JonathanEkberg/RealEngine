@@ -1,5 +1,5 @@
-#include "game.hpp"
-#include "renderer/constants.hpp"
+#include "game.h"
+#include "renderer/constants.h"
 
 void VulkanApplication::run() {
     initWindow();

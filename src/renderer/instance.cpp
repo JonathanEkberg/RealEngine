@@ -1,6 +1,6 @@
-#include "instance.hpp"
-#include "constants.hpp"
-#include "validation_layer.hpp"
+#include "instance.h"
+#include "constants.h"
+#include "validation_layer.h"
 
 #define GLFW_INCLUDE_VULKAN
 

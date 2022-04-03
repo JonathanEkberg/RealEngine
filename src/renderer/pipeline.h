@@ -1,6 +1,6 @@
 #pragma once
 
-#include "context.hpp"
+#include "context.h"
 
 namespace Renderer {
     void createGraphicsPipeline(Context *ctx);

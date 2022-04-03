@@ -1,7 +1,7 @@
-#include "swap_chain.hpp"
-#include "render_pass.hpp"
-#include "pipeline.hpp"
-#include "frame_buffer.hpp"
+#include "swap_chain.h"
+#include "render_pass.h"
+#include "pipeline.h"
+#include "frame_buffer.h"
 
 void Renderer::createImageViews(Renderer::Context *ctx) {
     ctx->swapChainImageViews.resize(ctx->swapChainImages.size());

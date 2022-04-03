@@ -30,6 +30,6 @@ link_libraries(${GLFW_SDK}/lib-vc2022/glfw3.lib)
 
 file(GLOB MAIN ./src/main.cpp)
 file(GLOB_RECURSE SRCFILES ./src/*.cpp)
-file(GLOB_RECURSE HEADERFILES ./src/*.hpp)
+file(GLOB_RECURSE HEADERFILES ./src/*.h)
 
 add_executable(vulkan_tutorial ${MAIN} ${SRCFILES} ${HEADERFILES})

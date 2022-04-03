@@ -1,7 +1,7 @@
 #include <stdexcept>
-#include "vertex.hpp"
-#include "constants.hpp"
-#include "device.hpp"
+#include "vertex.h"
+#include "constants.h"
+#include "device.h"
 
 void Renderer::createVertexBuffer(Renderer::Context *ctx) {
     VkBufferCreateInfo bufferInfo{};

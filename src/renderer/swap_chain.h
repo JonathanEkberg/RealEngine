@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-#include "context.hpp"
+#include "context.h"
 
 struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities{};

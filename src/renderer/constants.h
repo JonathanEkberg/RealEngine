@@ -4,7 +4,7 @@
 
 #include <GLFW/glfw3.h>
 #include <vector>
-#include "vertex.hpp"
+#include "vertex.h"
 
 using std::vector;
 

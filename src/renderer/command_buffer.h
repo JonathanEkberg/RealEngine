@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdexcept>
-#include "context.hpp"
+#include "context.h"
 
 namespace Renderer {
     void createCommandBuffers(Context *ctx);

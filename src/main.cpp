@@ -1,4 +1,4 @@
-#include "game.hpp"
+#include "game.h"
 
 #define GLFW_INCLUDE_VULKAN
 

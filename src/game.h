@@ -1,14 +1,14 @@
 #pragma once
 
-#include "renderer/instance.hpp"
-#include "renderer/surface.hpp"
-#include "renderer/device.hpp"
-#include "renderer/render_pass.hpp"
-#include "renderer/pipeline.hpp"
-#include "renderer/frame_buffer.hpp"
-#include "renderer/command_pool.hpp"
-#include "renderer/command_buffer.hpp"
-#include "renderer/synchronization.hpp"
+#include "renderer/instance.h"
+#include "renderer/surface.h"
+#include "renderer/device.h"
+#include "renderer/render_pass.h"
+#include "renderer/pipeline.h"
+#include "renderer/frame_buffer.h"
+#include "renderer/command_pool.h"
+#include "renderer/command_buffer.h"
+#include "renderer/synchronization.h"
 
 #define GLFW_INCLUDE_VULKAN
 

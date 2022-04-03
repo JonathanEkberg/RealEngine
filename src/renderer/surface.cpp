@@ -3,9 +3,9 @@
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
 
-#include "surface.hpp"
-#include "context.hpp"
-#include "device.hpp"
+#include "surface.h"
+#include "context.h"
+#include "device.h"
 
 #include <stdexcept>
 #include <iostream>

@@ -1,4 +1,4 @@
-#include "frame_buffer.hpp"
+#include "frame_buffer.h"
 
 void Renderer::createFramebuffers(Context *ctx) {
     ctx->swapChainFramebuffers.resize(ctx->swapChainImageViews.size());

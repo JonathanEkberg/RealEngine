@@ -1,11 +1,11 @@
-#include "validation_layer.hpp"
+#include "validation_layer.h"
 
 #include <cstdint>
 
 #define GLFW_INCLUDE_VULKAN
 
 #include <GLFW/glfw3.h>
-#include "./constants.hpp"
+#include "./constants.h"
 
 bool Renderer::checkValidationLayerSupport() {
     uint32_t layerCount;
