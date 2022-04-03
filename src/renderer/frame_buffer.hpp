@@ -7,5 +7,5 @@
 #include "context.hpp"
 
 namespace Renderer {
-    void createFramebuffers(Context *context);
+    void createFramebuffers(Context *ctx);
 }

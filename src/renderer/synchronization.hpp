@@ -8,5 +8,5 @@
 #include <stdexcept>
 
 namespace Renderer {
-    void createSyncObjects(Context *context);
+    void createSyncObjects(Context *ctx);
 }
