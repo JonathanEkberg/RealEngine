@@ -19,7 +19,9 @@ set(GLM_SDK "E:/dev/tools/glm")
 
 find_package(Vulkan REQUIRED FATAL_ERROR)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+if (exists ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+endif ()
 
 include_directories(${VULKAN_SDK}/Include)
 include_directories(${GLFW_SDK}/include)
