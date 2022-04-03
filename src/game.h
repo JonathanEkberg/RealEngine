@@ -9,6 +9,9 @@
 #include "renderer/command_pool.h"
 #include "renderer/command_buffer.h"
 #include "renderer/synchronization.h"
+#include "renderer/index_buffer.h"
+#include "renderer/constants.h"
+#include "renderer/index_buffer.h"
 
 #define GLFW_INCLUDE_VULKAN
 

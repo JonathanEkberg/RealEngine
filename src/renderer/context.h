@@ -35,8 +35,13 @@ namespace Renderer {
         vector<VkSemaphore> imageAvailableSemaphores, renderFinishedSemaphores;
         vector<VkFence> inFlightFences;
 
+        // Vertex data
         VkBuffer vertexBuffer{};
         VkDeviceMemory vertexBufferMemory;
+
+        // Index data
+        VkBuffer indexBuffer;
+        VkDeviceMemory indexBufferMemory;
 
         uint32_t currentFrame = 0;
         bool framebufferResized = false;
