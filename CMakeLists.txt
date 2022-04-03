@@ -28,4 +28,8 @@ include_directories(${GLM_SDK})
 link_libraries(${VULKAN_SDK}/Lib/vulkan-1.lib)
 link_libraries(${GLFW_SDK}/lib-vc2022/glfw3.lib)
 
-add_executable(vulkan_tutorial main.cpp)
+file(GLOB MAIN ./src/main.cpp)
+file(GLOB_RECURSE SRCFILES ./src/*.cpp)
+file(GLOB_RECURSE HEADERFILES ./src/*.hpp)
+
+add_executable(vulkan_tutorial ${MAIN} ${SRCFILES} ${HEADERFILES})
