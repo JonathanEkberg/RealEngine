@@ -10,23 +10,16 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -D _DEBUG ")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D _DEBUG ")
 
-#set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /Z7 /EHsc /Wall /analyze")
-#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Z7 /EHsc /Wall /analyze")
-# CUSTOM
-set(GLFW_SDK "E:/dev/tools/glfw-3.3.6.bin.WIN64")
-set(VULKAN_SDK "E:/dev/tools/Vulkan")
-set(GLM_SDK "E:/dev/tools/glm")
-
 find_package(Vulkan REQUIRED FATAL_ERROR)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-include_directories(${VULKAN_SDK}/Include)
-include_directories(${GLFW_SDK}/include)
-include_directories(${GLM_SDK})
+include_directories($ENV{VULKAN_SDK}/Include)
+include_directories($ENV{GLFW_SDK}/include)
+include_directories($ENV{GLM_SDK})
 
-link_libraries(${VULKAN_SDK}/Lib/vulkan-1.lib)
-link_libraries(${GLFW_SDK}/lib-vc2022/glfw3.lib)
+link_libraries($ENV{VULKAN_SDK}/Lib/vulkan-1.lib)
+link_libraries($ENV{GLFW_LIB_DIR}/glfw3.lib)
 
 file(GLOB MAIN ./src/main.cpp)
 file(GLOB_RECURSE SRCFILES ./src/*.cpp)
