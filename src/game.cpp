@@ -1,5 +1,4 @@
 #include "game.h"
-#include "renderer/constants.h"
 
 void VulkanApplication::run() {
     initWindow();
@@ -36,6 +35,7 @@ void VulkanApplication::initVulkan() {
     Renderer::createFramebuffers(&ctx);
     Renderer::createCommandPool(&ctx);
     Renderer::createVertexBuffer(&ctx);
+    Renderer::createIndexBuffer(&ctx);
     Renderer::createCommandBuffers(&ctx);
     Renderer::createSyncObjects(&ctx);
 }
@@ -114,6 +114,9 @@ void VulkanApplication::drawFrame() {
 
 void VulkanApplication::cleanup() {
     Renderer::cleanupSwapChain(&ctx);
+
+    vkDestroyBuffer(ctx.device, ctx.indexBuffer, nullptr);
+    vkFreeMemory(ctx.device, ctx.indexBufferMemory, nullptr);
 
     vkDestroyBuffer(ctx.device, ctx.vertexBuffer, nullptr);
     vkFreeMemory(ctx.device, ctx.vertexBufferMemory, nullptr);

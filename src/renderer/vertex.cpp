@@ -7,9 +7,9 @@
 void Renderer::createVertexBuffer(Renderer::Context *ctx) {
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
-    VkBuffer stagingBuffer;
+    VkBuffer stagingBuffer{};
     VkDeviceMemory stagingBufferMemory;
-    createBuffer(ctx, bufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+    createBuffer(ctx, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
                  stagingBufferMemory);
 
