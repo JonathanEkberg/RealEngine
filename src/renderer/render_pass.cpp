@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <iostream>
 #include "render_pass.h"
 
 void Renderer::createRenderPass(Context *context) {

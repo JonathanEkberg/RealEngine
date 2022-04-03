@@ -1,5 +1,7 @@
 #include "command_pool.h"
 
+#include <stdexcept>
+
 void Renderer::createCommandPool(Renderer::Context *ctx) {
     QueueFamilyIndices queueFamilyIndices = findQueueFamilies(ctx->physicalDevice, ctx->surface);
 

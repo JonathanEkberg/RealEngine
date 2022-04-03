@@ -1,8 +1,9 @@
 #include "pipeline.h"
+#include "vertex.h"
 #include "../file/file.hpp"
 #include "./shader.h"
-#include "vertex.h"
-#include "vertex.h"
+
+#include <iostream>
 
 void Renderer::createGraphicsPipeline(Renderer::Context *ctx) {
     const auto vertShaderCode = File::readFile("./shaders/vert.spv");

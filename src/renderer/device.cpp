@@ -36,11 +36,11 @@ void Renderer::pickPhysicalDevice(Renderer::Context *ctx) {
 }
 
 void Renderer::createLogicalDevice(Context *ctx) {
-    QueueFamilyIndices indices = findQueueFamilies(ctx->physicalDevice, ctx->surface);
+    QueueFamilyIndices queueFamilyIndices = findQueueFamilies(ctx->physicalDevice, ctx->surface);
 
     vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<uint32_t> uniqueQueueFamilies = {
-            indices.graphicsFamily.value(), indices.presentFamily.value()
+            queueFamilyIndices.graphicsFamily.value(), queueFamilyIndices.presentFamily.value()
     };
 
     float queuePriority = 1.0f;
@@ -74,8 +74,8 @@ void Renderer::createLogicalDevice(Context *ctx) {
         throw std::runtime_error("Failed to create logical device.");
     }
 
-    vkGetDeviceQueue(ctx->device, indices.graphicsFamily.value(), 0, &ctx->graphicsQueue);
-    vkGetDeviceQueue(ctx->device, indices.presentFamily.value(), 0, &ctx->presentQueue);
+    vkGetDeviceQueue(ctx->device, queueFamilyIndices.graphicsFamily.value(), 0, &ctx->graphicsQueue);
+    vkGetDeviceQueue(ctx->device, queueFamilyIndices.presentFamily.value(), 0, &ctx->presentQueue);
 
     std::cout << "Successfully created logical device!" << std::endl;
 }

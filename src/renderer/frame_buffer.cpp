@@ -1,5 +1,7 @@
 #include "frame_buffer.h"
 
+#include <stdexcept>
+
 void Renderer::createFramebuffers(Context *ctx) {
     ctx->swapChainFramebuffers.resize(ctx->swapChainImageViews.size());
 

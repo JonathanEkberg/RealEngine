@@ -1,3 +1,5 @@
+#include <stdexcept>
+#include <iostream>
 #include "shader.h"
 
 VkShaderModule Renderer::createShaderModule(Renderer::Context *ctx, const vector<char> &code) {

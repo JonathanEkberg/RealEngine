@@ -1,6 +1,8 @@
 #include "synchronization.h"
 #include "constants.h"
 
+#include <stdexcept>
+
 void Renderer::createSyncObjects(Context *ctx) {
     ctx->imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     ctx->renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);

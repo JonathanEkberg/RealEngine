@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdexcept>
-
 #include "context.h"
 
 struct SwapChainSupportDetails {

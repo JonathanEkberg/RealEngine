@@ -1,8 +1,9 @@
-#include <stdexcept>
 #include "vertex.h"
 #include "constants.h"
 #include "device.h"
 #include "buffer.h"
+
+#include <stdexcept>
 
 void Renderer::createVertexBuffer(Renderer::Context *ctx) {
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();

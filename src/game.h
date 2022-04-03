@@ -1,28 +1,12 @@
 #pragma once
 
-#include "renderer/instance.h"
-#include "renderer/surface.h"
-#include "renderer/device.h"
-#include "renderer/render_pass.h"
-#include "renderer/pipeline.h"
-#include "renderer/frame_buffer.h"
-#include "renderer/command_pool.h"
-#include "renderer/command_buffer.h"
-#include "renderer/synchronization.h"
-#include "renderer/index_buffer.h"
-#include "renderer/constants.h"
-#include "renderer/index_buffer.h"
+#include "renderer/context.h"
 
 #define GLFW_INCLUDE_VULKAN
 
 #include <GLFW/glfw3.h>
 
 #include <optional>
-#include <iostream>
-#include <stdexcept>
-#include <cstdlib>
-#include <vector>
-#include <algorithm>
 
 using std::optional;
 using std::vector;

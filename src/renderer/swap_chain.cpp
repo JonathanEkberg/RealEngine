@@ -3,6 +3,8 @@
 #include "pipeline.h"
 #include "frame_buffer.h"
 
+#include <stdexcept>
+
 void Renderer::createImageViews(Renderer::Context *ctx) {
     ctx->swapChainImageViews.resize(ctx->swapChainImages.size());
 

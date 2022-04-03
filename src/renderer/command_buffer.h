@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdexcept>
 #include "context.h"
 
 namespace Renderer {

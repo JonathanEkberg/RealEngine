@@ -1,6 +1,8 @@
 #include "command_buffer.h"
 #include "constants.h"
 
+#include <stdexcept>
+
 void Renderer::createCommandBuffers(Context *ctx) {
     ctx->commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
