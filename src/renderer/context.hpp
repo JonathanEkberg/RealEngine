@@ -9,6 +9,8 @@ using std::vector;
 
 namespace Renderer {
     struct Context {
+        uint32_t currentFrame = 0;
+
         GLFWwindow *window;
 
         VkInstance instance;
@@ -26,14 +28,14 @@ namespace Renderer {
         VkExtent2D swapChainExtent;
         vector<VkFramebuffer> swapChainFramebuffers;
         VkCommandPool commandPool;
-        VkCommandBuffer commandBuffer;
+        vector<VkCommandBuffer> commandBuffers;
 
         VkRenderPass renderPass;
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
 
-        VkSemaphore imageAvailableSemaphore, renderFinishedSemaphore;
-        VkFence inFlightFence;
+        vector<VkSemaphore> imageAvailableSemaphores, renderFinishedSemaphores;
+        vector<VkFence> inFlightFences;
     };
 
 }

@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "renderer/constants.hpp"
 
 void VulkanApplication::run() {
     initWindow();
@@ -29,7 +30,7 @@ void VulkanApplication::initVulkan() {
     Renderer::createGraphicsPipeline(&ctx);
     Renderer::createFramebuffers(&ctx);
     Renderer::createCommandPool(&ctx);
-    Renderer::createCommandBuffer(&ctx);
+    Renderer::createCommandBuffers(&ctx);
     Renderer::createSyncObjects(&ctx);
 }
 
@@ -43,32 +44,33 @@ void VulkanApplication::mainLoop() {
 }
 
 void VulkanApplication::drawFrame() {
-    vkWaitForFences(ctx.device, 1, &ctx.inFlightFence, VK_TRUE, UINT64_MAX);
-    vkResetFences(ctx.device, 1, &ctx.inFlightFence);
+    vkWaitForFences(ctx.device, 1, &ctx.inFlightFences[ctx.currentFrame], VK_TRUE, UINT64_MAX);
+    vkResetFences(ctx.device, 1, &ctx.inFlightFences[ctx.currentFrame]);
 
     uint32_t imageIndex;
-    vkAcquireNextImageKHR(ctx.device, ctx.swapChain, UINT64_MAX, ctx.imageAvailableSemaphore, VK_NULL_HANDLE,
+    vkAcquireNextImageKHR(ctx.device, ctx.swapChain, UINT64_MAX, ctx.imageAvailableSemaphores[ctx.currentFrame],
+                          VK_NULL_HANDLE,
                           &imageIndex);
 
-    vkResetCommandBuffer(ctx.commandBuffer, 0);
-    Renderer::recordCommandBuffer(&ctx, ctx.commandBuffer, imageIndex);
+    vkResetCommandBuffer(ctx.commandBuffers[ctx.currentFrame], 0);
+    Renderer::recordCommandBuffer(&ctx, ctx.commandBuffers[ctx.currentFrame], imageIndex);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    VkSemaphore waitSemaphores[] = {ctx.imageAvailableSemaphore};
+    VkSemaphore waitSemaphores[] = {ctx.imageAvailableSemaphores[ctx.currentFrame]};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &ctx.commandBuffer;
+    submitInfo.pCommandBuffers = &ctx.commandBuffers[ctx.currentFrame];
 
-    VkSemaphore signalSemaphores[] = {ctx.renderFinishedSemaphore};
+    VkSemaphore signalSemaphores[] = {ctx.renderFinishedSemaphores[ctx.currentFrame]};
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    if (vkQueueSubmit(ctx.graphicsQueue, 1, &submitInfo, ctx.inFlightFence) != VK_SUCCESS) {
+    if (vkQueueSubmit(ctx.graphicsQueue, 1, &submitInfo, ctx.inFlightFences[ctx.currentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("Failed to submit draw command buffer!");
     }
 
@@ -84,12 +86,16 @@ void VulkanApplication::drawFrame() {
     presentInfo.pResults = nullptr;
 
     vkQueuePresentKHR(ctx.graphicsQueue, &presentInfo);
+
+    ctx.currentFrame = (ctx.currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 void VulkanApplication::cleanup() {
-    vkDestroySemaphore(ctx.device, ctx.imageAvailableSemaphore, nullptr);
-    vkDestroySemaphore(ctx.device, ctx.renderFinishedSemaphore, nullptr);
-    vkDestroyFence(ctx.device, ctx.inFlightFence, nullptr);
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+        vkDestroySemaphore(ctx.device, ctx.imageAvailableSemaphores[i], nullptr);
+        vkDestroySemaphore(ctx.device, ctx.renderFinishedSemaphores[i], nullptr);
+        vkDestroyFence(ctx.device, ctx.inFlightFences[i], nullptr);
+    }
 
     vkDestroyCommandPool(ctx.device, ctx.commandPool, nullptr);
 

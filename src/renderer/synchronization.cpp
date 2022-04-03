@@ -1,6 +1,11 @@
 #include "synchronization.hpp"
+#include "constants.hpp"
 
-void Renderer::createSyncObjects(Renderer::Context *context) {
+void Renderer::createSyncObjects(Context *ctx) {
+    ctx->imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    ctx->renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    ctx->inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+
     VkSemaphoreCreateInfo semaphoreInfo{};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
@@ -8,23 +13,25 @@ void Renderer::createSyncObjects(Renderer::Context *context) {
     fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    auto createImageSemaphoreSuccess =
-            vkCreateSemaphore(context->device, &semaphoreInfo, nullptr, &context->imageAvailableSemaphore) ==
-            VK_SUCCESS;
-    if (!createImageSemaphoreSuccess) {
-        throw std::runtime_error("Failed to create image available semaphore!");
-    }
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        auto createImageSemaphoreSuccess =
+                vkCreateSemaphore(ctx->device, &semaphoreInfo, nullptr, &ctx->imageAvailableSemaphores[i]) ==
+                VK_SUCCESS;
+        if (!createImageSemaphoreSuccess) {
+            throw std::runtime_error("Failed to create image available semaphore!");
+        }
 
-    auto createRenderSemaphore =
-            vkCreateSemaphore(context->device, &semaphoreInfo, nullptr, &context->renderFinishedSemaphore) ==
-            VK_SUCCESS;
-    if (!createRenderSemaphore) {
-        throw std::runtime_error("Failed to create render finished semaphore!");
-    }
+        auto createRenderSemaphore =
+                vkCreateSemaphore(ctx->device, &semaphoreInfo, nullptr, &ctx->renderFinishedSemaphores[i]) ==
+                VK_SUCCESS;
+        if (!createRenderSemaphore) {
+            throw std::runtime_error("Failed to create render finished semaphore!");
+        }
 
-    auto createFenceSuccess =
-            vkCreateFence(context->device, &fenceInfo, nullptr, &context->inFlightFence) == VK_SUCCESS;
-    if (!createFenceSuccess) {
-        throw std::runtime_error("Failed to in flight fence!");
+        auto createFenceSuccess =
+                vkCreateFence(ctx->device, &fenceInfo, nullptr, &ctx->inFlightFences[i]) == VK_SUCCESS;
+        if (!createFenceSuccess) {
+            throw std::runtime_error("Failed to in flight fence!");
+        }
     }
 }

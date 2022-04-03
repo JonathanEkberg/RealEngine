@@ -1,13 +1,16 @@
 #include "command_buffer.hpp"
+#include "constants.hpp"
 
-void Renderer::createCommandBuffer(Context *ctx) {
+void Renderer::createCommandBuffers(Context *ctx) {
+    ctx->commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.commandPool = ctx->commandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = 1;
+    allocInfo.commandBufferCount = (uint32_t) ctx->commandBuffers.size();
 
-    if (vkAllocateCommandBuffers(ctx->device, &allocInfo, &ctx->commandBuffer) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(ctx->device, &allocInfo, ctx->commandBuffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate command buffer!");
     }
 }
