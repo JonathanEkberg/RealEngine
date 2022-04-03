@@ -1,4 +1,7 @@
 #include "swap_chain.hpp"
+#include "render_pass.hpp"
+#include "pipeline.hpp"
+#include "frame_buffer.hpp"
 
 void Renderer::createImageViews(Renderer::Context *ctx) {
     ctx->swapChainImageViews.resize(ctx->swapChainImages.size());
@@ -51,4 +54,38 @@ SwapChainSupportDetails Renderer::querySwapChainSupport(VkPhysicalDevice device,
     }
 
     return details;
+}
+
+void Renderer::recreateSwapChain(Renderer::Context *ctx) {
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(ctx->window, &width, &height);
+
+    while (width == 0 || height == 0) {
+        glfwGetFramebufferSize(ctx->window, &width, &height);
+        glfwWaitEvents();
+    }
+
+    vkDeviceWaitIdle(ctx->device);
+
+    Renderer::createSwapChain(ctx);
+    Renderer::createImageViews(ctx);
+    Renderer::createRenderPass(ctx);
+    Renderer::createGraphicsPipeline(ctx);
+    Renderer::createFramebuffers(ctx);
+}
+
+void Renderer::cleanupSwapChain(Renderer::Context *ctx) {
+    for (auto framebuffer: ctx->swapChainFramebuffers) {
+        vkDestroyFramebuffer(ctx->device, framebuffer, nullptr);
+    }
+
+    vkDestroyRenderPass(ctx->device, ctx->renderPass, nullptr);
+    vkDestroyPipeline(ctx->device, ctx->graphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(ctx->device, ctx->pipelineLayout, nullptr);
+
+    for (auto imageView: ctx->swapChainImageViews) {
+        vkDestroyImageView(ctx->device, imageView, nullptr);
+    }
+
+    vkDestroySwapchainKHR(ctx->device, ctx->swapChain, nullptr);
 }

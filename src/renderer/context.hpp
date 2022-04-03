@@ -9,8 +9,6 @@ using std::vector;
 
 namespace Renderer {
     struct Context {
-        uint32_t currentFrame = 0;
-
         GLFWwindow *window;
 
         VkInstance instance;
@@ -36,7 +34,9 @@ namespace Renderer {
 
         vector<VkSemaphore> imageAvailableSemaphores, renderFinishedSemaphores;
         vector<VkFence> inFlightFences;
-    };
 
+        uint32_t currentFrame = 0;
+        bool framebufferResized = false;
+    };
 }
 
