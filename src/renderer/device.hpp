@@ -23,4 +23,6 @@ namespace Renderer {
     static bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);
+
+    uint32_t findMemoryType(Context *ctx, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 }

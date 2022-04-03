@@ -35,6 +35,7 @@ void VulkanApplication::initVulkan() {
     Renderer::createGraphicsPipeline(&ctx);
     Renderer::createFramebuffers(&ctx);
     Renderer::createCommandPool(&ctx);
+    Renderer::createVertexBuffer(&ctx);
     Renderer::createCommandBuffers(&ctx);
     Renderer::createSyncObjects(&ctx);
 }
@@ -113,6 +114,9 @@ void VulkanApplication::drawFrame() {
 
 void VulkanApplication::cleanup() {
     Renderer::cleanupSwapChain(&ctx);
+
+    vkDestroyBuffer(ctx.device, ctx.vertexBuffer, nullptr);
+    vkFreeMemory(ctx.device, ctx.vertexBufferMemory, nullptr);
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
         vkDestroySemaphore(ctx.device, ctx.imageAvailableSemaphores[i], nullptr);
