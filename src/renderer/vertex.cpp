@@ -10,19 +10,21 @@ void Renderer::createVertexBuffer(Renderer::Context *ctx) {
 
     VkBuffer stagingBuffer{};
     VkDeviceMemory stagingBufferMemory;
-    createBuffer(ctx, bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
-                 stagingBufferMemory);
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, ctx->device,
+                 ctx->physicalDevice, stagingBuffer, stagingBufferMemory);
 
     void *data;
     vkMapMemory(ctx->device, stagingBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, vertices.data(), (size_t) bufferSize);
     vkUnmapMemory(ctx->device, stagingBufferMemory);
 
-    createBuffer(ctx, bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, ctx->vertexBuffer, ctx->vertexBufferMemory);
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, ctx->device, ctx->physicalDevice, ctx->vertexBuffer,
+                 ctx->vertexBufferMemory);
 
-    Renderer::copyBuffer(ctx, stagingBuffer, ctx->vertexBuffer, bufferSize);
+    Renderer::copyBuffer(stagingBuffer, ctx->vertexBuffer, bufferSize, ctx->device, ctx->commandPool,
+                         ctx->graphicsQueue);
 
     vkDestroyBuffer(ctx->device, stagingBuffer, nullptr);
     vkFreeMemory(ctx->device, stagingBufferMemory, nullptr);

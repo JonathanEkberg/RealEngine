@@ -7,5 +7,5 @@
 #include <GLFW/glfw3.h>
 
 namespace Renderer {
-    void createRenderPass(Context *context);
+    void createRenderPass(Context *ctx);
 }

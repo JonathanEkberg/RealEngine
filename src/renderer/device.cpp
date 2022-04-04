@@ -10,33 +10,34 @@ bool QueueFamilyIndices::isComplete() const {
     return graphicsFamily.has_value() && presentFamily.has_value();
 }
 
-void Renderer::pickPhysicalDevice(Renderer::Context *ctx) {
+void Renderer::pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface, VkPhysicalDevice *physicalDevice) {
     uint32_t deviceCount = 0;
-    vkEnumeratePhysicalDevices(ctx->instance, &deviceCount, nullptr);
+    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 
     if (deviceCount == 0) {
         throw std::runtime_error("Failed to find devices with Vulkan support!");
     }
 
     vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(ctx->instance, &deviceCount, devices.data());
+    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
     for (const auto &device: devices) {
-        if (Renderer::isDeviceSuitable(device, ctx->surface)) {
-            ctx->physicalDevice = device;
+        if (Renderer::isDeviceSuitable(device, surface)) {
+            *physicalDevice = device;
             break;
         }
     }
 
-    if (ctx->physicalDevice == VK_NULL_HANDLE) {
+    if (physicalDevice == VK_NULL_HANDLE) {
         throw std::runtime_error("Failed to find a device with Vulkan support!");
     }
 
     std::cout << "Found device with Vulkan support!" << std::endl;
 }
 
-void Renderer::createLogicalDevice(Context *ctx) {
-    QueueFamilyIndices queueFamilyIndices = findQueueFamilies(ctx->physicalDevice, ctx->surface);
+void Renderer::createLogicalDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, VkDevice *device,
+                                   VkQueue *graphicsQueue, VkQueue *presentQueue) {
+    QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice, surface);
 
     vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<uint32_t> uniqueQueueFamilies = {
@@ -70,12 +71,12 @@ void Renderer::createLogicalDevice(Context *ctx) {
         createInfo.enabledLayerCount = 0;
     }
 
-    if (vkCreateDevice(ctx->physicalDevice, &createInfo, nullptr, &ctx->device) != VK_SUCCESS) {
+    if (vkCreateDevice(physicalDevice, &createInfo, nullptr, device) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create logical device.");
     }
 
-    vkGetDeviceQueue(ctx->device, queueFamilyIndices.graphicsFamily.value(), 0, &ctx->graphicsQueue);
-    vkGetDeviceQueue(ctx->device, queueFamilyIndices.presentFamily.value(), 0, &ctx->presentQueue);
+    vkGetDeviceQueue(*device, queueFamilyIndices.graphicsFamily.value(), 0, graphicsQueue);
+    vkGetDeviceQueue(*device, queueFamilyIndices.presentFamily.value(), 0, presentQueue);
 
     std::cout << "Successfully created logical device!" << std::endl;
 }
@@ -144,9 +145,10 @@ bool Renderer::isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface) {
     return indices.isComplete() && extensionsSupported && swapChainAdequate;
 }
 
-uint32_t Renderer::findMemoryType(Context *ctx, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
+uint32_t
+Renderer::findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties) {
     VkPhysicalDeviceMemoryProperties memProperties;
-    vkGetPhysicalDeviceMemoryProperties(ctx->physicalDevice, &memProperties);
+    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
         if (typeFilter & (1 << i) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {

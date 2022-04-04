@@ -3,21 +3,24 @@
 
 #include <stdexcept>
 
-void Renderer::createCommandBuffers(Context *ctx) {
-    ctx->commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+void Renderer::createCommandBuffers(VkDevice device, VkCommandPool commandPool,
+                                    std::vector<VkCommandBuffer> *commandBuffers) {
+    commandBuffers->resize(MAX_FRAMES_IN_FLIGHT);
 
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = ctx->commandPool;
+    allocInfo.commandPool = commandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandBufferCount = (uint32_t) ctx->commandBuffers.size();
+    allocInfo.commandBufferCount = (uint32_t) commandBuffers->size();
 
-    if (vkAllocateCommandBuffers(ctx->device, &allocInfo, ctx->commandBuffers.data()) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers->data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate command buffer!");
     }
 }
 
-void Renderer::recordCommandBuffer(Renderer::Context *ctx, VkCommandBuffer commandBuffer, uint32_t imageIndex) {
+void Renderer::recordCommandBuffer(uint32_t imageIndex, VkPipeline graphicsPipeline, VkCommandBuffer commandBuffer,
+                                   VkBuffer vertexBuffer, VkBuffer indexBuffer, VkRenderPass renderPass,
+                                   VkExtent2D swapChainExtent, std::vector<VkFramebuffer> swapChainFrameBuffers) {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = 0;
@@ -29,22 +32,22 @@ void Renderer::recordCommandBuffer(Renderer::Context *ctx, VkCommandBuffer comma
 
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = ctx->renderPass;
-    renderPassInfo.framebuffer = ctx->swapChainFramebuffers[imageIndex];
+    renderPassInfo.renderPass = renderPass;
+    renderPassInfo.framebuffer = swapChainFrameBuffers[imageIndex];
     renderPassInfo.renderArea.offset = {0, 0};
-    renderPassInfo.renderArea.extent = ctx->swapChainExtent;
+    renderPassInfo.renderArea.extent = swapChainExtent;
 
     VkClearValue clearColor = {{{0.05f, 0.05f, 0.05f, 1.0f}}};
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearColor;
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, ctx->graphicsPipeline);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-    VkBuffer vertexBuffers[] = {ctx->vertexBuffer};
+    VkBuffer vertexBuffers[] = {vertexBuffer};
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-    vkCmdBindIndexBuffer(commandBuffer, ctx->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 

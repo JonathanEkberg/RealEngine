@@ -6,8 +6,9 @@
 #include <vulkan/vulkan.hpp>
 
 namespace Renderer {
-    void createBuffer(Context *ctx, VkDeviceSize size, VkBufferUsageFlags usage,
-                      VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkDevice device,
+                      VkPhysicalDevice physicalDevice, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
 
-    void copyBuffer(Context *ctx, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size, VkDevice device,
+                    VkCommandPool commandPool, VkQueue graphicsQueue);
 }

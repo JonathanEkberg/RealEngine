@@ -14,9 +14,10 @@ struct QueueFamilyIndices {
 };
 
 namespace Renderer {
-    void pickPhysicalDevice(Context *ctx);
+    void pickPhysicalDevice(VkInstance instance, VkSurfaceKHR surface, VkPhysicalDevice *physicalDevice);
 
-    void createLogicalDevice(Context *ctx);
+    void createLogicalDevice(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, VkDevice *device,
+                             VkQueue *graphicsQueue, VkQueue *presentQueue);
 
     bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface);
 
@@ -24,5 +25,5 @@ namespace Renderer {
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);
 
-    uint32_t findMemoryType(Context *ctx, uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    uint32_t findMemoryType(VkPhysicalDevice physicalDevice, uint32_t typeFilter, VkMemoryPropertyFlags properties);
 }

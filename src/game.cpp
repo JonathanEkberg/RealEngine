@@ -1,4 +1,3 @@
-#include <iostream>
 #include "game.h"
 #include "renderer/instance.h"
 #include "renderer/surface.h"
@@ -12,6 +11,8 @@
 #include "renderer/command_buffer.h"
 #include "renderer/synchronization.h"
 #include "renderer/constants.h"
+
+#include <iostream>
 
 void VulkanApplication::run() {
     initWindow();
@@ -39,8 +40,8 @@ void VulkanApplication::initWindow() {
 void VulkanApplication::initVulkan() {
     Renderer::createInstance(&ctx);
     Renderer::createSurface(&ctx);
-    Renderer::pickPhysicalDevice(&ctx);
-    Renderer::createLogicalDevice(&ctx);
+    Renderer::pickPhysicalDevice(ctx.instance, ctx.surface, &ctx.physicalDevice);
+    Renderer::createLogicalDevice(ctx.physicalDevice, ctx.surface, &ctx.device, &ctx.graphicsQueue, &ctx.presentQueue);
     Renderer::createSwapChain(&ctx);
     Renderer::createImageViews(&ctx);
     Renderer::createRenderPass(&ctx);
@@ -49,7 +50,7 @@ void VulkanApplication::initVulkan() {
     Renderer::createCommandPool(&ctx);
     Renderer::createVertexBuffer(&ctx);
     Renderer::createIndexBuffer(&ctx);
-    Renderer::createCommandBuffers(&ctx);
+    Renderer::createCommandBuffers(ctx.device, ctx.commandPool, &ctx.commandBuffers);
     Renderer::createSyncObjects(&ctx);
 }
 
@@ -80,9 +81,13 @@ void VulkanApplication::drawFrame() {
     }
 
     vkResetFences(ctx.device, 1, &ctx.inFlightFences[ctx.currentFrame]);
+    auto test = ctx.commandBuffers[ctx.currentFrame];
 
     vkResetCommandBuffer(ctx.commandBuffers[ctx.currentFrame], 0);
-    Renderer::recordCommandBuffer(&ctx, ctx.commandBuffers[ctx.currentFrame], imageIndex);
+//    Renderer::recordCommandBuffer(&ctx, ctx.commandBuffers[ctx.currentFrame], imageIndex);
+    Renderer::recordCommandBuffer(imageIndex, ctx.graphicsPipeline, ctx.commandBuffers[ctx.currentFrame],
+                                  ctx.vertexBuffer, ctx.indexBuffer, ctx.renderPass, ctx.swapChainExtent,
+                                  ctx.swapChainFramebuffers);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
