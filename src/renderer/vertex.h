@@ -16,5 +16,14 @@ namespace Renderer {
         static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions();
     };
 
-    void createVertexBuffer(Context *ctx);
+    struct CreateVertexBufferInfo {
+        VkDevice device;
+        VkPhysicalDevice physicalDevice;
+        VkCommandPool commandPool;
+        VkQueue graphicsQueue;
+        VkBuffer &vertexBuffer;
+        VkDeviceMemory &pVertexBufferMemory;
+    };
+
+    void createVertexBuffer(CreateVertexBufferInfo &info);
 }

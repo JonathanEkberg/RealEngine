@@ -43,10 +43,6 @@ void VulkanApplication::initVulkan() {
     Renderer::pickPhysicalDevice(ctx.instance, ctx.surface, &ctx.physicalDevice);
     Renderer::createLogicalDevice(ctx.physicalDevice, ctx.surface, &ctx.device, &ctx.graphicsQueue, &ctx.presentQueue);
 
-
-//    Renderer::CreateSwapChainInfo createSwapChainData = Renderer::CreateSwapChainInfo{
-//            ctx->physicalDevice
-//    };
     Renderer::CreateSwapChainInfo createSwapChainData{
             ctx.physicalDevice,
             ctx.device,
@@ -61,12 +57,22 @@ void VulkanApplication::initVulkan() {
 
     Renderer::createImageViews(ctx.device, ctx.swapChainImages, ctx.swapChainImageFormat, &ctx.swapChainImageViews);
     Renderer::createRenderPass(ctx.device, ctx.swapChainImageFormat, &ctx.renderPass);
-    Renderer::createGraphicsPipeline(ctx.device, ctx.pipelineLayout, ctx.renderPass, ctx.swapChainExtent,
-                                     ctx.graphicsPipeline);
+    Renderer::createGraphicsPipeline(ctx.device, ctx.renderPass, ctx.swapChainExtent,
+                                     ctx.graphicsPipeline, ctx.pipelineLayout);
     Renderer::createFramebuffers(ctx.device, ctx.renderPass, &ctx.swapChainFramebuffers, ctx.swapChainExtent,
                                  ctx.swapChainImageViews);
     Renderer::createCommandPool(ctx.device, ctx.physicalDevice, ctx.surface, &ctx.commandPool);
-    Renderer::createVertexBuffer(&ctx);
+
+    Renderer::CreateVertexBufferInfo createVertexBufferInfo{
+            ctx.device,
+            ctx.physicalDevice,
+            ctx.commandPool,
+            ctx.graphicsQueue,
+            ctx.vertexBuffer,
+            ctx.vertexBufferMemory,
+    };
+    Renderer::createVertexBuffer(createVertexBufferInfo);
+
     Renderer::createIndexBuffer(ctx.device, ctx.physicalDevice, ctx.commandPool, ctx.graphicsQueue, &ctx.indexBuffer,
                                 &ctx.indexBufferMemory);
     Renderer::createCommandBuffers(ctx.device, ctx.commandPool, ctx.commandBuffers);
@@ -193,7 +199,7 @@ void VulkanApplication::drawFrame() {
 }
 
 void VulkanApplication::cleanup() {
-    Renderer::cleanupSwapChain(&ctx);
+    Renderer::cleanupSwapChain(ctx);
 
     vkDestroyBuffer(ctx.device, ctx.indexBuffer, nullptr);
     vkFreeMemory(ctx.device, ctx.indexBufferMemory, nullptr);

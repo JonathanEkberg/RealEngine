@@ -34,7 +34,7 @@ namespace Renderer {
 
     void recreateSwapChain(RecreateSwapChainData &data);
 
-    void cleanupSwapChain(Context *ctx);
+    void cleanupSwapChain(Context &ctx);
 
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 

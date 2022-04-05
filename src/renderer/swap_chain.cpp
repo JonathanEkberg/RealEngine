@@ -138,24 +138,24 @@ void Renderer::recreateSwapChain(RecreateSwapChainData &data) {
     Renderer::createImageViews(createData.device, createData.pSwapChainImages, createData.pSwapChainImageFormat,
                                &data.pSwapChainImageViews);
     Renderer::createRenderPass(createData.device, createData.pSwapChainImageFormat, &data.renderPass);
-    Renderer::createGraphicsPipeline(createData.device, data.pipelineLayout, data.renderPass,
-                                     createData.pSwapChainExtent, data.pipeline);
+    Renderer::createGraphicsPipeline(createData.device, data.renderPass,
+                                     createData.pSwapChainExtent, data.pipeline, data.pipelineLayout);
     Renderer::createFramebuffers(createData.device, data.renderPass, &data.swapChainFramebuffers,
                                  createData.pSwapChainExtent, data.pSwapChainImageViews);
 }
 
-void Renderer::cleanupSwapChain(Renderer::Context *ctx) {
-    for (auto framebuffer: ctx->swapChainFramebuffers) {
-        vkDestroyFramebuffer(ctx->device, framebuffer, nullptr);
+void Renderer::cleanupSwapChain(Renderer::Context &ctx) {
+    for (auto framebuffer: ctx.swapChainFramebuffers) {
+        vkDestroyFramebuffer(ctx.device, framebuffer, nullptr);
     }
 
-    vkDestroyRenderPass(ctx->device, ctx->renderPass, nullptr);
-    vkDestroyPipeline(ctx->device, ctx->graphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(ctx->device, ctx->pipelineLayout, nullptr);
+    vkDestroyRenderPass(ctx.device, ctx.renderPass, nullptr);
+    vkDestroyPipeline(ctx.device, ctx.graphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(ctx.device, ctx.pipelineLayout, nullptr);
 
-    for (auto imageView: ctx->swapChainImageViews) {
-        vkDestroyImageView(ctx->device, imageView, nullptr);
+    for (auto imageView: ctx.swapChainImageViews) {
+        vkDestroyImageView(ctx.device, imageView, nullptr);
     }
 
-    vkDestroySwapchainKHR(ctx->device, ctx->swapChain, nullptr);
+    vkDestroySwapchainKHR(ctx.device, ctx.swapChain, nullptr);
 }

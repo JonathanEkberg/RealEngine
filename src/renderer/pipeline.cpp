@@ -5,8 +5,8 @@
 
 #include <iostream>
 
-void Renderer::createGraphicsPipeline(VkDevice device, VkPipelineLayout pipelineLayout, VkRenderPass renderPass,
-                                      VkExtent2D swapChainExtent, VkPipeline &graphicsPipeline) {
+void Renderer::createGraphicsPipeline(VkDevice device, VkRenderPass renderPass, VkExtent2D swapChainExtent,
+                                      VkPipeline &graphicsPipeline, VkPipelineLayout &pipelineLayout) {
     const auto vertShaderCode = File::readFile("./shaders/vert.spv");
     const auto fragShaderCode = File::readFile("./shaders/frag.spv");
 
