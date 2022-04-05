@@ -56,7 +56,7 @@ void VulkanApplication::initVulkan() {
     Renderer::createSwapChain(createSwapChainData);
 
     Renderer::createImageViews(ctx.device, ctx.swapChainImages, ctx.swapChainImageFormat, &ctx.swapChainImageViews);
-    Renderer::createRenderPass(ctx.device, ctx.swapChainImageFormat, &ctx.renderPass);
+    Renderer::createRenderPass(ctx.device, ctx.swapChainImageFormat, ctx.renderPass);
     Renderer::createGraphicsPipeline(ctx.device, ctx.renderPass, ctx.swapChainExtent,
                                      ctx.graphicsPipeline, ctx.pipelineLayout);
     Renderer::createFramebuffers(ctx.device, ctx.renderPass, &ctx.swapChainFramebuffers, ctx.swapChainExtent,
@@ -111,9 +111,9 @@ void VulkanApplication::drawFrame() {
         };
         Renderer::RecreateSwapChainData recreateSwapChainData{
                 createSwapChainData,
-                ctx.renderPass,
                 ctx.graphicsPipeline,
                 ctx.pipelineLayout,
+                ctx.renderPass,
                 ctx.swapChainImageViews,
                 ctx.swapChainFramebuffers,
         };
@@ -184,9 +184,9 @@ void VulkanApplication::drawFrame() {
         };
         Renderer::RecreateSwapChainData recreateSwapChainData{
                 createSwapChainData,
-                ctx.renderPass,
                 ctx.graphicsPipeline,
                 ctx.pipelineLayout,
+                ctx.renderPass,
                 ctx.swapChainImageViews,
                 ctx.swapChainFramebuffers,
         };

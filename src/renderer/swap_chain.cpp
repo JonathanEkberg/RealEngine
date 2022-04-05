@@ -69,6 +69,12 @@ void Renderer::createSwapChain(CreateSwapChainInfo &info) {
 
 void Renderer::createImageViews(VkDevice device, std::vector<VkImage> swapChainImages, VkFormat swapChainImageFormat,
                                 std::vector<VkImageView> *swapChainImageViews) {
+    if (!swapChainImageViews->empty()) {
+        for (auto imageView: *swapChainImageViews) {
+            vkDestroyImageView(device, imageView, nullptr);
+        }
+    }
+
     swapChainImageViews->resize(swapChainImages.size());
 
     for (size_t i = 0; i < swapChainImages.size(); i++) {
@@ -137,10 +143,10 @@ void Renderer::recreateSwapChain(RecreateSwapChainData &data) {
     Renderer::createSwapChain(createData);
     Renderer::createImageViews(createData.device, createData.pSwapChainImages, createData.pSwapChainImageFormat,
                                &data.pSwapChainImageViews);
-    Renderer::createRenderPass(createData.device, createData.pSwapChainImageFormat, &data.renderPass);
-    Renderer::createGraphicsPipeline(createData.device, data.renderPass,
+    Renderer::createRenderPass(createData.device, createData.pSwapChainImageFormat, data.pRenderPass);
+    Renderer::createGraphicsPipeline(createData.device, data.pRenderPass,
                                      createData.pSwapChainExtent, data.pipeline, data.pipelineLayout);
-    Renderer::createFramebuffers(createData.device, data.renderPass, &data.swapChainFramebuffers,
+    Renderer::createFramebuffers(createData.device, data.pRenderPass, &data.swapChainFramebuffers,
                                  createData.pSwapChainExtent, data.pSwapChainImageViews);
 }
 

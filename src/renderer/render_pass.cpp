@@ -2,7 +2,7 @@
 #include <iostream>
 #include "render_pass.h"
 
-void Renderer::createRenderPass(VkDevice device, VkFormat swapChainImageFormat, VkRenderPass *renderPass) {
+void Renderer::createRenderPass(VkDevice device, VkFormat swapChainImageFormat, VkRenderPass &renderPass) {
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = swapChainImageFormat;
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -39,7 +39,7 @@ void Renderer::createRenderPass(VkDevice device, VkFormat swapChainImageFormat, 
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(device, &renderPassInfo, nullptr, renderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create render pass!");
     }
 

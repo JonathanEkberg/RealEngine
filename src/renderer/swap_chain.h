@@ -25,9 +25,9 @@ namespace Renderer {
     struct RecreateSwapChainData {
         CreateSwapChainInfo createInfo;
 
-        VkRenderPass renderPass;
-        VkPipeline pipeline;
-        VkPipelineLayout pipelineLayout;
+        VkPipeline &pipeline;
+        VkPipelineLayout &pipelineLayout;
+        VkRenderPass &pRenderPass;
         std::vector<VkImageView> &pSwapChainImageViews;
         std::vector<VkFramebuffer> &swapChainFramebuffers;
     };
