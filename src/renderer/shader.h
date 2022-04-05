@@ -10,5 +10,5 @@
 using std::vector;
 
 namespace Renderer {
-    VkShaderModule createShaderModule(Context *ctx, const vector<char> &code);
+    VkShaderModule createShaderModule(VkDevice device, const vector<char> &code);
 }

@@ -8,11 +8,11 @@
 #include <GLFW/glfw3.h>
 
 namespace Renderer {
-    void createSurface(Context *ctx);
+    void createSurface(GLFWwindow *window, VkInstance instance, VkSurfaceKHR *surface);
 
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const vector<VkSurfaceFormatKHR> &availableFormats);
 
     VkPresentModeKHR chooseSwapPresentMode(const vector<VkPresentModeKHR> &availablePresentModes);
 
-    VkExtent2D chooseSwapExtent(Context *ctx, const VkSurfaceCapabilitiesKHR &capabilities);
+    VkExtent2D chooseSwapExtent(GLFWwindow *window, const VkSurfaceCapabilitiesKHR &capabilities);
 }

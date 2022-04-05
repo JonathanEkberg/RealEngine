@@ -5,15 +5,16 @@
 
 #include <iostream>
 
-void Renderer::createGraphicsPipeline(Renderer::Context *ctx) {
+void Renderer::createGraphicsPipeline(VkDevice device, VkPipelineLayout pipelineLayout, VkRenderPass renderPass,
+                                      VkExtent2D swapChainExtent, VkPipeline &graphicsPipeline) {
     const auto vertShaderCode = File::readFile("./shaders/vert.spv");
     const auto fragShaderCode = File::readFile("./shaders/frag.spv");
 
     std::cout << "Vert shader size: " << vertShaderCode.size() << "\n";
     std::cout << "Frag shader size: " << fragShaderCode.size() << std::endl;
 
-    VkShaderModule vertShaderModule = Renderer::createShaderModule(ctx, vertShaderCode);
-    VkShaderModule fragShaderModule = Renderer::createShaderModule(ctx, fragShaderCode);
+    VkShaderModule vertShaderModule = Renderer::createShaderModule(device, vertShaderCode);
+    VkShaderModule fragShaderModule = Renderer::createShaderModule(device, fragShaderCode);
 
     // Info about the vertex shader.
     VkPipelineShaderStageCreateInfo vertShaderStateInfo{};
@@ -50,14 +51,14 @@ void Renderer::createGraphicsPipeline(Renderer::Context *ctx) {
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float) ctx->swapChainExtent.width;
-    viewport.height = (float) ctx->swapChainExtent.height;
+    viewport.width = (float) swapChainExtent.width;
+    viewport.height = (float) swapChainExtent.height;
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor{};
     scissor.offset = {0, 0};
-    scissor.extent = ctx->swapChainExtent;
+    scissor.extent = swapChainExtent;
 
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -121,7 +122,7 @@ void Renderer::createGraphicsPipeline(Renderer::Context *ctx) {
 //        pipelineLayoutInfo.pSetLayouts = nullptr;
 //        pipelineLayoutInfo.pPushConstantRanges = nullptr;
 
-    if (vkCreatePipelineLayout(ctx->device, &pipelineLayoutInfo, nullptr, &ctx->pipelineLayout) !=
+    if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
         VK_SUCCESS) {
         throw std::runtime_error("Failed to create graphics pipeline layout!");
     }
@@ -136,20 +137,20 @@ void Renderer::createGraphicsPipeline(Renderer::Context *ctx) {
     pipelineInfo.pRasterizationState = &rasterizer;
     pipelineInfo.pMultisampleState = &multisampling;
     pipelineInfo.pColorBlendState = &colorBlending;
-    pipelineInfo.layout = ctx->pipelineLayout;
-    pipelineInfo.renderPass = ctx->renderPass;
+    pipelineInfo.layout = pipelineLayout;
+    pipelineInfo.renderPass = renderPass;
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 //        pipelineInfo.pDepthStencilState = nullptr;
 //        pipelineInfo.pDynamicState = nullptr;
 //        pipelineInfo.basePipelineIndex = -1;
 
-    if (vkCreateGraphicsPipelines(ctx->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr,
-                                  &ctx->graphicsPipeline) !=
+    if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr,
+                                  &graphicsPipeline) !=
         VK_SUCCESS) {
         throw std::runtime_error("Failed to create graphics pipeline!");
     }
 
-    vkDestroyShaderModule(ctx->device, fragShaderModule, nullptr);
-    vkDestroyShaderModule(ctx->device, vertShaderModule, nullptr);
+    vkDestroyShaderModule(device, fragShaderModule, nullptr);
+    vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }

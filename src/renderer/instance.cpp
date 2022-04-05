@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <iostream>
 
-void Renderer::createInstance(Context *ctx) {
+void Renderer::createInstance(VkInstance *instance) {
     if (enableValidationLayers && !checkValidationLayerSupport()) {
         throw std::runtime_error("Validation layers requested, but not available!");
     }
@@ -41,7 +41,7 @@ void Renderer::createInstance(Context *ctx) {
     createInfo.ppEnabledExtensionNames = glfwExtensions;
 //        createInfo.enabledLayerCount = 0;
 
-    if (vkCreateInstance(&createInfo, nullptr, &ctx->instance) != VK_SUCCESS) {
+    if (vkCreateInstance(&createInfo, nullptr, instance) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create instance!");
     }
 

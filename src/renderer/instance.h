@@ -7,5 +7,5 @@
 #include <GLFW/glfw3.h>
 
 namespace Renderer {
-    void createInstance(Context *ctx);
+    void createInstance(VkInstance *instance);
 }

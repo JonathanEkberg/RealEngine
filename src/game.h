@@ -2,10 +2,6 @@
 
 #include "renderer/context.h"
 
-#define GLFW_INCLUDE_VULKAN
-
-#include <GLFW/glfw3.h>
-
 #include <optional>
 
 using std::optional;
@@ -16,8 +12,8 @@ public:
     void run();
 
 private:
-    static const size_t WIDTH = 1920;
-    static const size_t HEIGHT = 1080;
+    static constexpr size_t WIDTH = 1920;
+    static constexpr size_t HEIGHT = 1080;
 
     Renderer::Context ctx;
 

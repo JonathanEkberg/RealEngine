@@ -38,19 +38,38 @@ void VulkanApplication::initWindow() {
 }
 
 void VulkanApplication::initVulkan() {
-    Renderer::createInstance(&ctx);
-    Renderer::createSurface(&ctx);
+    Renderer::createInstance(&ctx.instance);
+    Renderer::createSurface(ctx.window, ctx.instance, &ctx.surface);
     Renderer::pickPhysicalDevice(ctx.instance, ctx.surface, &ctx.physicalDevice);
     Renderer::createLogicalDevice(ctx.physicalDevice, ctx.surface, &ctx.device, &ctx.graphicsQueue, &ctx.presentQueue);
-    Renderer::createSwapChain(&ctx);
-    Renderer::createImageViews(&ctx);
-    Renderer::createRenderPass(&ctx);
-    Renderer::createGraphicsPipeline(&ctx);
-    Renderer::createFramebuffers(&ctx);
-    Renderer::createCommandPool(&ctx);
+
+
+//    Renderer::CreateSwapChainInfo createSwapChainData = Renderer::CreateSwapChainInfo{
+//            ctx->physicalDevice
+//    };
+    Renderer::CreateSwapChainInfo createSwapChainData{
+            ctx.physicalDevice,
+            ctx.device,
+            ctx.surface,
+            ctx.window,
+            ctx.swapChain,
+            ctx.swapChainImages,
+            ctx.swapChainImageFormat,
+            ctx.swapChainExtent
+    };
+    Renderer::createSwapChain(createSwapChainData);
+
+    Renderer::createImageViews(ctx.device, ctx.swapChainImages, ctx.swapChainImageFormat, &ctx.swapChainImageViews);
+    Renderer::createRenderPass(ctx.device, ctx.swapChainImageFormat, &ctx.renderPass);
+    Renderer::createGraphicsPipeline(ctx.device, ctx.pipelineLayout, ctx.renderPass, ctx.swapChainExtent,
+                                     ctx.graphicsPipeline);
+    Renderer::createFramebuffers(ctx.device, ctx.renderPass, &ctx.swapChainFramebuffers, ctx.swapChainExtent,
+                                 ctx.swapChainImageViews);
+    Renderer::createCommandPool(ctx.device, ctx.physicalDevice, ctx.surface, &ctx.commandPool);
     Renderer::createVertexBuffer(&ctx);
-    Renderer::createIndexBuffer(&ctx);
-    Renderer::createCommandBuffers(ctx.device, ctx.commandPool, &ctx.commandBuffers);
+    Renderer::createIndexBuffer(ctx.device, ctx.physicalDevice, ctx.commandPool, ctx.graphicsQueue, &ctx.indexBuffer,
+                                &ctx.indexBufferMemory);
+    Renderer::createCommandBuffers(ctx.device, ctx.commandPool, ctx.commandBuffers);
     Renderer::createSyncObjects(&ctx);
 }
 
@@ -74,7 +93,25 @@ void VulkanApplication::drawFrame() {
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || ctx.framebufferResized) {
         ctx.framebufferResized = false;
-        Renderer::recreateSwapChain(&ctx);
+        auto createSwapChainData = Renderer::CreateSwapChainInfo{
+                ctx.physicalDevice,
+                ctx.device,
+                ctx.surface,
+                ctx.window,
+                ctx.swapChain,
+                ctx.swapChainImages,
+                ctx.swapChainImageFormat,
+                ctx.swapChainExtent,
+        };
+        Renderer::RecreateSwapChainData recreateSwapChainData{
+                createSwapChainData,
+                ctx.renderPass,
+                ctx.graphicsPipeline,
+                ctx.pipelineLayout,
+                ctx.swapChainImageViews,
+                ctx.swapChainFramebuffers,
+        };
+        Renderer::recreateSwapChain(recreateSwapChainData);
         return;
     } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         throw std::runtime_error("Failed to aquire swap chain image!");
@@ -84,10 +121,17 @@ void VulkanApplication::drawFrame() {
     auto test = ctx.commandBuffers[ctx.currentFrame];
 
     vkResetCommandBuffer(ctx.commandBuffers[ctx.currentFrame], 0);
-//    Renderer::recordCommandBuffer(&ctx, ctx.commandBuffers[ctx.currentFrame], imageIndex);
-    Renderer::recordCommandBuffer(imageIndex, ctx.graphicsPipeline, ctx.commandBuffers[ctx.currentFrame],
-                                  ctx.vertexBuffer, ctx.indexBuffer, ctx.renderPass, ctx.swapChainExtent,
-                                  ctx.swapChainFramebuffers);
+    Renderer::RecordCommandBufferInfo recordCommandBufferInfo{
+            imageIndex,
+            ctx.graphicsPipeline,
+            ctx.commandBuffers[ctx.currentFrame],
+            ctx.vertexBuffer,
+            ctx.indexBuffer,
+            ctx.renderPass,
+            ctx.swapChainExtent,
+            ctx.swapChainFramebuffers
+    };
+    Renderer::recordCommandBuffer(recordCommandBufferInfo);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -122,7 +166,25 @@ void VulkanApplication::drawFrame() {
     result = vkQueuePresentKHR(ctx.graphicsQueue, &presentInfo);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
-        Renderer::recreateSwapChain(&ctx);
+        auto createSwapChainData = Renderer::CreateSwapChainInfo{
+                ctx.physicalDevice,
+                ctx.device,
+                ctx.surface,
+                ctx.window,
+                ctx.swapChain,
+                ctx.swapChainImages,
+                ctx.swapChainImageFormat,
+                ctx.swapChainExtent,
+        };
+        Renderer::RecreateSwapChainData recreateSwapChainData{
+                createSwapChainData,
+                ctx.renderPass,
+                ctx.graphicsPipeline,
+                ctx.pipelineLayout,
+                ctx.swapChainImageViews,
+                ctx.swapChainFramebuffers,
+        };
+        Renderer::recreateSwapChain(recreateSwapChainData);
     } else if (result != VK_SUCCESS) {
         throw std::runtime_error("Failed to present swap chain image!");
     }
@@ -155,3 +217,6 @@ void VulkanApplication::cleanup() {
 
     glfwTerminate();
 }
+
+
+

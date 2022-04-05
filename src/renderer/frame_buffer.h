@@ -7,5 +7,7 @@
 #include <GLFW/glfw3.h>
 
 namespace Renderer {
-    void createFramebuffers(Context *ctx);
+    void createFramebuffers(VkDevice device, VkRenderPass renderPass,
+                            std::vector<VkFramebuffer> *swapChainFramebuffers, VkExtent2D swapChainExtent,
+                            std::vector<VkImageView> swapChainImageViews);
 }
