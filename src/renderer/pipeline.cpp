@@ -1,7 +1,7 @@
 #include "pipeline.h"
-#include "vertex.h"
 #include "../file/file.hpp"
 #include "./shader.h"
+#include "vertex.h"
 
 #include <iostream>
 

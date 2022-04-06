@@ -1,6 +1,9 @@
 #pragma once
 
 #include <optional>
+#include <vector>
+#include <GLFW/glfw3.h>
+#include <vulkan/vulkan.h>
 
 using std::optional;
 using std::vector;

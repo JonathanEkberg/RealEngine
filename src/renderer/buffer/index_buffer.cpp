@@ -1,5 +1,5 @@
 #include "index_buffer.h"
-#include "constants.h"
+#include "../constants.h"
 #include "buffer.h"
 
 #include <vulkan/vulkan.h>
