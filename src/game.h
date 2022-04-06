@@ -1,7 +1,5 @@
 #pragma once
 
-#include "renderer/context.h"
-
 #include <optional>
 
 using std::optional;
