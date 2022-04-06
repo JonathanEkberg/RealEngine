@@ -1,6 +1,6 @@
 #pragma once
 
-#include "context.h"
+#include <vulkan/vulkan.h>
 
 namespace Renderer {
     void createIndexBuffer(VkDevice device, VkPhysicalDevice physicalDevice, VkCommandPool commandPool,

@@ -58,22 +58,22 @@ void Renderer::createSwapChain(CreateSwapChainInfo &info) {
     }
 
     vkGetSwapchainImagesKHR(info.device, info.pSwapChain, &imageCount, nullptr);
-    info.pSwapChainImages.resize(imageCount);
-    vkGetSwapchainImagesKHR(info.device, info.pSwapChain, &imageCount, info.pSwapChainImages.data());
+    info.swapChainImages.resize(imageCount);
+    vkGetSwapchainImagesKHR(info.device, info.pSwapChain, &imageCount, info.swapChainImages.data());
 
-    info.pSwapChainImageFormat = surfaceFormat.format;
-    info.pSwapChainExtent = extent;
+    info.swapChainImageFormat = surfaceFormat.format;
+    info.swapChainExtent = extent;
 
     std::cout << "Successfully created swap chain!" << std::endl;
 }
 
 void Renderer::createImageViews(VkDevice device, std::vector<VkImage> swapChainImages, VkFormat swapChainImageFormat,
                                 std::vector<VkImageView> *swapChainImageViews) {
-    if (!swapChainImageViews->empty()) {
-        for (auto imageView: *swapChainImageViews) {
-            vkDestroyImageView(device, imageView, nullptr);
-        }
-    }
+//    if (!swapChainImageViews->empty()) {
+//        for (auto imageView: *swapChainImageViews) {
+//            vkDestroyImageView(device, imageView, nullptr);
+//        }
+//    }
 
     swapChainImageViews->resize(swapChainImages.size());
 
@@ -140,28 +140,34 @@ void Renderer::recreateSwapChain(RecreateSwapChainData &data) {
 
     vkDeviceWaitIdle(createData.device);
 
+    Renderer::cleanupSwapChain(data.createInfo.device, data.pipeline, data.pipelineLayout, data.pRenderPass,
+                               data.createInfo.pSwapChain, data.swapChainImageViews, data.swapChainFramebuffers);
+
     Renderer::createSwapChain(createData);
-    Renderer::createImageViews(createData.device, createData.pSwapChainImages, createData.pSwapChainImageFormat,
-                               &data.pSwapChainImageViews);
-    Renderer::createRenderPass(createData.device, createData.pSwapChainImageFormat, data.pRenderPass);
+    Renderer::createImageViews(createData.device, createData.swapChainImages, createData.swapChainImageFormat,
+                               &data.swapChainImageViews);
+    Renderer::createRenderPass(createData.device, createData.swapChainImageFormat, data.pRenderPass);
     Renderer::createGraphicsPipeline(createData.device, data.pRenderPass,
-                                     createData.pSwapChainExtent, data.pipeline, data.pipelineLayout);
+                                     createData.swapChainExtent, data.pipeline, data.pipelineLayout);
     Renderer::createFramebuffers(createData.device, data.pRenderPass, &data.swapChainFramebuffers,
-                                 createData.pSwapChainExtent, data.pSwapChainImageViews);
+                                 createData.swapChainExtent, data.swapChainImageViews);
 }
 
-void Renderer::cleanupSwapChain(Renderer::Context &ctx) {
-    for (auto framebuffer: ctx.swapChainFramebuffers) {
-        vkDestroyFramebuffer(ctx.device, framebuffer, nullptr);
+void Renderer::cleanupSwapChain(VkDevice &device, VkPipeline &graphicsPipeline, VkPipelineLayout &pipelineLayout,
+                                VkRenderPass &renderPass, VkSwapchainKHR &swapChain,
+                                const std::vector<VkImageView> &swapChainImageViews,
+                                const std::vector<VkFramebuffer> &swapChainFramebuffers) {
+    for (auto framebuffer: swapChainFramebuffers) {
+        vkDestroyFramebuffer(device, framebuffer, nullptr);
     }
 
-    vkDestroyRenderPass(ctx.device, ctx.renderPass, nullptr);
-    vkDestroyPipeline(ctx.device, ctx.graphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(ctx.device, ctx.pipelineLayout, nullptr);
+    vkDestroyRenderPass(device, renderPass, nullptr);
+    vkDestroyPipeline(device, graphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 
-    for (auto imageView: ctx.swapChainImageViews) {
-        vkDestroyImageView(ctx.device, imageView, nullptr);
+    for (auto imageView: swapChainImageViews) {
+        vkDestroyImageView(device, imageView, nullptr);
     }
 
-    vkDestroySwapchainKHR(ctx.device, ctx.swapChain, nullptr);
+    vkDestroySwapchainKHR(device, swapChain, nullptr);
 }

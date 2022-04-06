@@ -3,10 +3,12 @@
 
 #include <stdexcept>
 
-void Renderer::createSyncObjects(Context *ctx) {
-    ctx->imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    ctx->renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-    ctx->inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+void Renderer::createSyncObjects(VkDevice device, std::vector<VkSemaphore> &imageAvailableSemaphores,
+                                 std::vector<VkSemaphore> &renderFinishedSemaphores,
+                                 std::vector<VkFence> &inFlightFences) {
+    imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
 
     VkSemaphoreCreateInfo semaphoreInfo{};
     semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -17,21 +19,21 @@ void Renderer::createSyncObjects(Context *ctx) {
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         auto createImageSemaphoreSuccess =
-                vkCreateSemaphore(ctx->device, &semaphoreInfo, nullptr, &ctx->imageAvailableSemaphores[i]) ==
+                vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) ==
                 VK_SUCCESS;
         if (!createImageSemaphoreSuccess) {
             throw std::runtime_error("Failed to create image available semaphore!");
         }
 
         auto createRenderSemaphore =
-                vkCreateSemaphore(ctx->device, &semaphoreInfo, nullptr, &ctx->renderFinishedSemaphores[i]) ==
+                vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) ==
                 VK_SUCCESS;
         if (!createRenderSemaphore) {
             throw std::runtime_error("Failed to create render finished semaphore!");
         }
 
         auto createFenceSuccess =
-                vkCreateFence(ctx->device, &fenceInfo, nullptr, &ctx->inFlightFences[i]) == VK_SUCCESS;
+                vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]) == VK_SUCCESS;
         if (!createFenceSuccess) {
             throw std::runtime_error("Failed to in flight fence!");
         }

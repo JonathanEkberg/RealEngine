@@ -1,6 +1,5 @@
 #pragma once
 
-#include "context.h"
 #include "device.h"
 
 #include <vulkan/vulkan.hpp>

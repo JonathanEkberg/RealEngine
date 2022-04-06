@@ -1,23 +1,26 @@
 #pragma once
 
-#include "context.h"
+
+#include <vulkan/vulkan.h>
+#include <vector>
+#include <GLFW/glfw3.h>
 
 struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities{};
-    vector<VkSurfaceFormatKHR> formats;
-    vector<VkPresentModeKHR> presentModes;
+    std::vector<VkSurfaceFormatKHR> formats;
+    std::vector<VkPresentModeKHR> presentModes;
 };
 
 namespace Renderer {
     struct CreateSwapChainInfo {
-        VkPhysicalDevice physicalDevice;
-        VkDevice device;
-        VkSurfaceKHR surface;
+        VkPhysicalDevice &physicalDevice;
+        VkDevice &device;
+        VkSurfaceKHR &surface;
         GLFWwindow *window;
         VkSwapchainKHR &pSwapChain;
-        std::vector<VkImage> &pSwapChainImages;
-        VkFormat &pSwapChainImageFormat;
-        VkExtent2D &pSwapChainExtent;
+        std::vector<VkImage> &swapChainImages;
+        VkFormat &swapChainImageFormat;
+        VkExtent2D &swapChainExtent;
     };
 
     void createSwapChain(CreateSwapChainInfo &info);
@@ -28,13 +31,16 @@ namespace Renderer {
         VkPipeline &pipeline;
         VkPipelineLayout &pipelineLayout;
         VkRenderPass &pRenderPass;
-        std::vector<VkImageView> &pSwapChainImageViews;
+        std::vector<VkImageView> &swapChainImageViews;
         std::vector<VkFramebuffer> &swapChainFramebuffers;
     };
 
     void recreateSwapChain(RecreateSwapChainData &data);
 
-    void cleanupSwapChain(Context &ctx);
+    void cleanupSwapChain(VkDevice &device, VkPipeline &graphicsPipeline, VkPipelineLayout &pipelineLayout,
+                          VkRenderPass &renderPass, VkSwapchainKHR &swapChain,
+                          const std::vector<VkImageView> &swapChainImageViews,
+                          const std::vector<VkFramebuffer> &swapChainFramebuffers);
 
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface);
 

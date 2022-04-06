@@ -29,93 +29,93 @@ void VulkanApplication::initWindow() {
 
     std::cout << "Vulkan supported?: " << glfwVulkanSupported() << std::endl;
 
-    ctx.window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
-    glfwSetWindowUserPointer(ctx.window, this);
-    glfwSetWindowSizeCallback(ctx.window, [](GLFWwindow *window, int width, int height) {
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+    glfwSetWindowUserPointer(window, this);
+    glfwSetWindowSizeCallback(window, [](GLFWwindow *window, int width, int height) {
         auto app = reinterpret_cast<VulkanApplication *>(glfwGetWindowUserPointer(window));
-        app->ctx.framebufferResized = true;
+        app->framebufferResized = true;
     });
 }
 
 void VulkanApplication::initVulkan() {
-    Renderer::createInstance(&ctx.instance);
-    Renderer::createSurface(ctx.window, ctx.instance, &ctx.surface);
-    Renderer::pickPhysicalDevice(ctx.instance, ctx.surface, &ctx.physicalDevice);
-    Renderer::createLogicalDevice(ctx.physicalDevice, ctx.surface, &ctx.device, &ctx.graphicsQueue, &ctx.presentQueue);
+    Renderer::createInstance(&instance);
+    Renderer::createSurface(window, instance, &surface);
+    Renderer::pickPhysicalDevice(instance, surface, &physicalDevice);
+    Renderer::createLogicalDevice(physicalDevice, surface, &device, &graphicsQueue, &presentQueue);
 
     Renderer::CreateSwapChainInfo createSwapChainData{
-            ctx.physicalDevice,
-            ctx.device,
-            ctx.surface,
-            ctx.window,
-            ctx.swapChain,
-            ctx.swapChainImages,
-            ctx.swapChainImageFormat,
-            ctx.swapChainExtent
+            physicalDevice,
+            device,
+            surface,
+            window,
+            swapChain,
+            swapChainImages,
+            swapChainImageFormat,
+            swapChainExtent
     };
     Renderer::createSwapChain(createSwapChainData);
 
-    Renderer::createImageViews(ctx.device, ctx.swapChainImages, ctx.swapChainImageFormat, &ctx.swapChainImageViews);
-    Renderer::createRenderPass(ctx.device, ctx.swapChainImageFormat, ctx.renderPass);
-    Renderer::createGraphicsPipeline(ctx.device, ctx.renderPass, ctx.swapChainExtent,
-                                     ctx.graphicsPipeline, ctx.pipelineLayout);
-    Renderer::createFramebuffers(ctx.device, ctx.renderPass, &ctx.swapChainFramebuffers, ctx.swapChainExtent,
-                                 ctx.swapChainImageViews);
-    Renderer::createCommandPool(ctx.device, ctx.physicalDevice, ctx.surface, &ctx.commandPool);
+    Renderer::createImageViews(device, swapChainImages, swapChainImageFormat, &swapChainImageViews);
+    Renderer::createRenderPass(device, swapChainImageFormat, renderPass);
+    Renderer::createGraphicsPipeline(device, renderPass, swapChainExtent,
+                                     graphicsPipeline, pipelineLayout);
+    Renderer::createFramebuffers(device, renderPass, &swapChainFramebuffers, swapChainExtent,
+                                 swapChainImageViews);
+    Renderer::createCommandPool(device, physicalDevice, surface, &commandPool);
 
     Renderer::CreateVertexBufferInfo createVertexBufferInfo{
-            ctx.device,
-            ctx.physicalDevice,
-            ctx.commandPool,
-            ctx.graphicsQueue,
-            ctx.vertexBuffer,
-            ctx.vertexBufferMemory,
+            device,
+            physicalDevice,
+            commandPool,
+            graphicsQueue,
+            vertexBuffer,
+            vertexBufferMemory,
     };
     Renderer::createVertexBuffer(createVertexBufferInfo);
 
-    Renderer::createIndexBuffer(ctx.device, ctx.physicalDevice, ctx.commandPool, ctx.graphicsQueue, &ctx.indexBuffer,
-                                &ctx.indexBufferMemory);
-    Renderer::createCommandBuffers(ctx.device, ctx.commandPool, ctx.commandBuffers);
-    Renderer::createSyncObjects(&ctx);
+    Renderer::createIndexBuffer(device, physicalDevice, commandPool, graphicsQueue, &indexBuffer,
+                                &indexBufferMemory);
+    Renderer::createCommandBuffers(device, commandPool, commandBuffers);
+    Renderer::createSyncObjects(device, imageAvailableSemaphores, renderFinishedSemaphores,
+                                inFlightFences);
 }
 
 void VulkanApplication::mainLoop() {
-    while (!glfwWindowShouldClose(ctx.window)) {
+    while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         drawFrame();
     }
 
-    vkDeviceWaitIdle(ctx.device);
+    vkDeviceWaitIdle(device);
 }
 
 void VulkanApplication::drawFrame() {
-    vkWaitForFences(ctx.device, 1, &ctx.inFlightFences[ctx.currentFrame], VK_TRUE, UINT64_MAX);
+    vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
-    VkResult result = vkAcquireNextImageKHR(ctx.device, ctx.swapChain, UINT64_MAX,
-                                            ctx.imageAvailableSemaphores[ctx.currentFrame],
+    VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX,
+                                            imageAvailableSemaphores[currentFrame],
                                             VK_NULL_HANDLE,
                                             &imageIndex);
 
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || ctx.framebufferResized) {
-        ctx.framebufferResized = false;
-        auto createSwapChainData = Renderer::CreateSwapChainInfo{
-                ctx.physicalDevice,
-                ctx.device,
-                ctx.surface,
-                ctx.window,
-                ctx.swapChain,
-                ctx.swapChainImages,
-                ctx.swapChainImageFormat,
-                ctx.swapChainExtent,
-        };
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+        framebufferResized = false;
         Renderer::RecreateSwapChainData recreateSwapChainData{
-                createSwapChainData,
-                ctx.graphicsPipeline,
-                ctx.pipelineLayout,
-                ctx.renderPass,
-                ctx.swapChainImageViews,
-                ctx.swapChainFramebuffers,
+                Renderer::CreateSwapChainInfo{
+                        physicalDevice,
+                        device,
+                        surface,
+                        window,
+                        swapChain,
+                        swapChainImages,
+                        swapChainImageFormat,
+                        swapChainExtent,
+                },
+                graphicsPipeline,
+                pipelineLayout,
+                renderPass,
+                swapChainImageViews,
+                swapChainFramebuffers,
         };
         Renderer::recreateSwapChain(recreateSwapChainData);
         return;
@@ -123,38 +123,37 @@ void VulkanApplication::drawFrame() {
         throw std::runtime_error("Failed to aquire swap chain image!");
     }
 
-    vkResetFences(ctx.device, 1, &ctx.inFlightFences[ctx.currentFrame]);
-    auto test = ctx.commandBuffers[ctx.currentFrame];
+    vkResetFences(device, 1, &inFlightFences[currentFrame]);
 
-    vkResetCommandBuffer(ctx.commandBuffers[ctx.currentFrame], 0);
+    vkResetCommandBuffer(commandBuffers[currentFrame], 0);
     Renderer::RecordCommandBufferInfo recordCommandBufferInfo{
             imageIndex,
-            ctx.graphicsPipeline,
-            ctx.commandBuffers[ctx.currentFrame],
-            ctx.vertexBuffer,
-            ctx.indexBuffer,
-            ctx.renderPass,
-            ctx.swapChainExtent,
-            ctx.swapChainFramebuffers
+            graphicsPipeline,
+            commandBuffers[currentFrame],
+            vertexBuffer,
+            indexBuffer,
+            renderPass,
+            swapChainExtent,
+            swapChainFramebuffers
     };
     Renderer::recordCommandBuffer(recordCommandBufferInfo);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    VkSemaphore waitSemaphores[] = {ctx.imageAvailableSemaphores[ctx.currentFrame]};
+    VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &ctx.commandBuffers[ctx.currentFrame];
+    submitInfo.pCommandBuffers = &commandBuffers[currentFrame];
 
-    VkSemaphore signalSemaphores[] = {ctx.renderFinishedSemaphores[ctx.currentFrame]};
+    VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[currentFrame]};
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    if (vkQueueSubmit(ctx.graphicsQueue, 1, &submitInfo, ctx.inFlightFences[ctx.currentFrame]) != VK_SUCCESS) {
+    if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("Failed to submit draw command buffer!");
     }
 
@@ -163,63 +162,63 @@ void VulkanApplication::drawFrame() {
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = signalSemaphores;
 
-    VkSwapchainKHR swapChains[] = {ctx.swapChain};
+    VkSwapchainKHR swapChains[] = {swapChain};
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
     presentInfo.pImageIndices = &imageIndex;
     presentInfo.pResults = nullptr;
 
-    result = vkQueuePresentKHR(ctx.graphicsQueue, &presentInfo);
+    result = vkQueuePresentKHR(graphicsQueue, &presentInfo);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
-        auto createSwapChainData = Renderer::CreateSwapChainInfo{
-                ctx.physicalDevice,
-                ctx.device,
-                ctx.surface,
-                ctx.window,
-                ctx.swapChain,
-                ctx.swapChainImages,
-                ctx.swapChainImageFormat,
-                ctx.swapChainExtent,
-        };
         Renderer::RecreateSwapChainData recreateSwapChainData{
-                createSwapChainData,
-                ctx.graphicsPipeline,
-                ctx.pipelineLayout,
-                ctx.renderPass,
-                ctx.swapChainImageViews,
-                ctx.swapChainFramebuffers,
+                Renderer::CreateSwapChainInfo{
+                        physicalDevice,
+                        device,
+                        surface,
+                        window,
+                        swapChain,
+                        swapChainImages,
+                        swapChainImageFormat,
+                        swapChainExtent,
+                },
+                graphicsPipeline,
+                pipelineLayout,
+                renderPass,
+                swapChainImageViews,
+                swapChainFramebuffers,
         };
         Renderer::recreateSwapChain(recreateSwapChainData);
     } else if (result != VK_SUCCESS) {
         throw std::runtime_error("Failed to present swap chain image!");
     }
 
-    ctx.currentFrame = (ctx.currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 void VulkanApplication::cleanup() {
-    Renderer::cleanupSwapChain(ctx);
+    Renderer::cleanupSwapChain(device, graphicsPipeline, pipelineLayout, renderPass, swapChain,
+                               swapChainImageViews, swapChainFramebuffers);
 
-    vkDestroyBuffer(ctx.device, ctx.indexBuffer, nullptr);
-    vkFreeMemory(ctx.device, ctx.indexBufferMemory, nullptr);
+    vkDestroyBuffer(device, indexBuffer, nullptr);
+    vkFreeMemory(device, indexBufferMemory, nullptr);
 
-    vkDestroyBuffer(ctx.device, ctx.vertexBuffer, nullptr);
-    vkFreeMemory(ctx.device, ctx.vertexBufferMemory, nullptr);
+    vkDestroyBuffer(device, vertexBuffer, nullptr);
+    vkFreeMemory(device, vertexBufferMemory, nullptr);
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-        vkDestroySemaphore(ctx.device, ctx.imageAvailableSemaphores[i], nullptr);
-        vkDestroySemaphore(ctx.device, ctx.renderFinishedSemaphores[i], nullptr);
-        vkDestroyFence(ctx.device, ctx.inFlightFences[i], nullptr);
+        vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
+        vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
+        vkDestroyFence(device, inFlightFences[i], nullptr);
     }
 
-    vkDestroyCommandPool(ctx.device, ctx.commandPool, nullptr);
+    vkDestroyCommandPool(device, commandPool, nullptr);
 
-    vkDestroySurfaceKHR(ctx.instance, ctx.surface, nullptr);
-    vkDestroyDevice(ctx.device, nullptr);
-    vkDestroyInstance(ctx.instance, nullptr);
+    vkDestroySurfaceKHR(instance, surface, nullptr);
+    vkDestroyDevice(device, nullptr);
+    vkDestroyInstance(instance, nullptr);
 
-    glfwDestroyWindow(ctx.window);
+    glfwDestroyWindow(window);
 
     glfwTerminate();
 }

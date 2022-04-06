@@ -1,8 +1,7 @@
 #pragma once
 
-#include "context.h"
-
 #include <optional>
+#include <vulkan/vulkan.h>
 
 using std::optional;
 

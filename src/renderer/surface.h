@@ -1,6 +1,6 @@
 #pragma once
 
-#include "context.h"
+
 #include "swap_chain.h"
 
 #define GLFW_INCLUDE_VULKAN
@@ -10,9 +10,9 @@
 namespace Renderer {
     void createSurface(GLFWwindow *window, VkInstance instance, VkSurfaceKHR *surface);
 
-    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const vector<VkSurfaceFormatKHR> &availableFormats);
+    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
 
-    VkPresentModeKHR chooseSwapPresentMode(const vector<VkPresentModeKHR> &availablePresentModes);
+    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
 
     VkExtent2D chooseSwapExtent(GLFWwindow *window, const VkSurfaceCapabilitiesKHR &capabilities);
 }

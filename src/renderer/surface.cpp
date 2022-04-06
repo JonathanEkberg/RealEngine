@@ -1,5 +1,5 @@
 #include "surface.h"
-#include "context.h"
+
 #include "device.h"
 
 #define GLFW_INCLUDE_VULKAN
@@ -17,7 +17,7 @@ void Renderer::createSurface(GLFWwindow *window, VkInstance instance, VkSurfaceK
     std::cout << "Successfully created window surface!" << std::endl;
 }
 
-VkSurfaceFormatKHR Renderer::chooseSwapSurfaceFormat(const vector<VkSurfaceFormatKHR> &availableFormats) {
+VkSurfaceFormatKHR Renderer::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats) {
     // Check for SRGB support
     for (const auto &availableFormats: availableFormats) {
         if (availableFormats.format == VK_FORMAT_B8G8R8A8_SRGB &&
@@ -29,7 +29,7 @@ VkSurfaceFormatKHR Renderer::chooseSwapSurfaceFormat(const vector<VkSurfaceForma
     return availableFormats[0];
 }
 
-VkPresentModeKHR Renderer::chooseSwapPresentMode(const vector<VkPresentModeKHR> &availablePresentModes) {
+VkPresentModeKHR Renderer::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
     for (const auto &availablePresentMode: availablePresentModes) {
         if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
             return availablePresentMode;

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "context.h"
 
 #define GLFW_INCLUDE_VULKAN
 

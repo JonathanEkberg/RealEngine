@@ -1,11 +1,10 @@
 #pragma once
 
-#include "context.h"
-
-#define GLFW_INCLUDE_VULKAN
-
-#include <GLFW/glfw3.h>
+#include <vector>
+#include <vulkan/vulkan.h>
 
 namespace Renderer {
-    void createSyncObjects(Context *ctx);
+    void createSyncObjects(VkDevice device, std::vector<VkSemaphore> &imageAvailableSemaphores,
+                           std::vector<VkSemaphore> &renderFinishedSemaphores,
+                           std::vector<VkFence> &inFlightFences);
 }
