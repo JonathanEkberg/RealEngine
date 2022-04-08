@@ -11,6 +11,7 @@
 #include "renderer/buffer/command_buffer.h"
 #include "renderer/synchronization.h"
 #include "renderer/constants.h"
+#include "renderer/buffer/uniform_buffer.h"
 
 #include <iostream>
 
@@ -57,6 +58,7 @@ void VulkanApplication::initVulkan() {
 
     Renderer::createImageViews(device, swapChainImages, swapChainImageFormat, &swapChainImageViews);
     Renderer::createRenderPass(device, swapChainImageFormat, renderPass);
+    Renderer::createDescriptorSetLayout();
     Renderer::createGraphicsPipeline(device, renderPass, swapChainExtent,
                                      graphicsPipeline, pipelineLayout);
     Renderer::createFramebuffers(device, renderPass, &swapChainFramebuffers, swapChainExtent,

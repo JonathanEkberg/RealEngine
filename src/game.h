@@ -36,6 +36,7 @@ private:
     vector<VkCommandBuffer> commandBuffers;
 
     VkRenderPass renderPass;
+    VkDescriptorSetLayout descriptorSetLayout;
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
 
